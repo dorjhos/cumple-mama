@@ -6,16 +6,43 @@
     <title>Panel de Administración - Servidor</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        .btn-game {
+            background: #ff4d6d;
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.3s;
+        }
+        .btn-game:hover {
+            background: #c9184a;
+        }
+    </style>
 </head>
 <body>
     <header>
         <div class="logo">⚙️ Panel Admin en Vivo</div>
         <nav>
+            <a href="acepto.html" class="btn-game">🎮 Jugar Interruptores</a>
             <a href="index.html">Ver Sitio Principal 🌸</a>
         </nav>
     </header>
 
     <div class="main-container">
+        <!-- Tarjeta de Acceso Directo al Juego -->
+        <div style="background: white; padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; border: 1px solid rgba(255,182,193,0.5); display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="color: #590d22; margin-bottom: 0.25rem;">🎮 Juego de Interruptores</h3>
+                <p style="color: #6c757d; font-size: 0.9rem;">Prueba el minijuego especial de niveles interactivos.</p>
+            </div>
+            <a href="acepto.html" class="btn-game">Iniciar Juego ➔</a>
+        </div>
+
         <form id="slide-form">
             <h2>Agregar Diapositiva 🖼️</h2>
             <div class="form-group">
@@ -140,7 +167,7 @@
             const text = document.getElementById('message-input').value;
             serverData.messages.push(text);
             await saveServerData();
-            document.getElementById('message-input').reset();
+            document.getElementById('message-form').reset();
         });
 
         window.deleteSlide = async function(index) {
