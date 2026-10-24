@@ -108,10 +108,31 @@
 
         window.onload = loadContent;
     </script>
-</body>
-</html>
 
-        window.onload = loadContent;
+    <!-- 🎵 REPRODUCTOR DE MÚSICA OCULTO (Se activa con el primer toque en pantalla) -->
+    <audio id="bg-music" src="cancion.mp3" loop></audio>
+
+    <script>
+        let musicaIniciada = false;
+
+        function activarMusicaAlInteractuar() {
+            if (!musicaIniciada) {
+                const music = document.getElementById('bg-music');
+                
+                music.play().then(() => {
+                    musicaIniciada = true;
+                    window.removeEventListener('click', activarMusicaAlInteractuar);
+                    window.removeEventListener('touchstart', activarMusicaAlInteractuar);
+                    window.removeEventListener('keydown', activarMusicaAlInteractuar);
+                }).catch(error => {
+                    console.log("Esperando la primera interacción del usuario para iniciar audio...");
+                });
+            }
+        }
+
+        window.addEventListener('click', activarMusicaAlInteractuar);
+        window.addEventListener('touchstart', activarMusicaAlInteractuar);
+        window.addEventListener('keydown', activarMusicaAlInteractuar);
     </script>
 </body>
 </html>
