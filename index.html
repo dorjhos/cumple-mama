@@ -17,51 +17,61 @@
     </header>
 
     <div class="main-container">
-        <!-- Diapositivas / Slideshow -->
         <section class="slider-container" id="slider">
             <div class="slide-media" id="slide-media" hidden>
                 <img id="slide-image" alt="Recuerdo especial de mamá">
             </div>
-            <p class="presentation-message" id="presentation-message"></p>
+            <div class="slide-copy" id="slide-copy">
+                <h2 class="slide-title" id="slide-title">Cargando del servidor...</h2>
+                <p class="slide-desc" id="slide-desc"></p>
+            </div>
+            <div class="message-banner">
+                <p class="presentation-message" id="presentation-message"></p>
+            </div>
         </section>
     </div>
 
     <script>
-        function loadContent() {
-            const SLIDE_INTERVAL_MS = 12000;
-            const MESSAGE_INTERVAL_MS = 5000;
-            const defaultSlides = [
-                { title: "¡Feliz Cumpleaños Mamá! 🎉", description: "Hoy celebramos tu vida y todo el amor que nos has dado. ¡Te queremos con todo nuestro corazón!" },
-                { title: "Gracias por tanto amor 🌸", description: "Gracias por ser nuestra guía, por tus consejos y por estar siempre presente. ¡Que disfrutes muchísimo tu día!" },
-                { title: "Eres nuestro ejemplo 💖", description: "Tu cariño, tu fortaleza y tu alegría hacen que cada día sea más especial. ¡Te admiramos muchísimo!" }
-            ];
+        async function loadContent() {
+            const SLIDE_INTERVAL_MS = 8000;
+            const MESSAGE_INTERVAL_MS = 4000;
 
-            const storedSlides = JSON.parse(localStorage.getItem('slides'));
-            const hasLegacyDadContent = storedSlides?.some(slide => slide.title?.includes('Papá'));
-            const slides = storedSlides && !hasLegacyDadContent ? storedSlides : defaultSlides;
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
-            const presentationSlides = slides.map(slide => ({
-                type: slide.image ? 'image' : 'text',
-                title: slide.title,
-                description: slide.description,
-                data: slide.image?.data
-            }));
+            let slides = [];
+            let messages = [];
 
-            let currentSlide = 0;
-            let currentMessage = 0;
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                slides = data.slides || [];
+                messages = data.messages || [];
+            } catch (error) {
+                console.error("Error al conectar con el servidor:", error);
+            }
+
             const mediaElem = document.getElementById('slide-media');
             const imageElem = document.getElementById('slide-image');
+            const titleElem = document.getElementById('slide-title');
+            const descElem = document.getElementById('slide-desc');
             const messageElem = document.getElementById('presentation-message');
             const sliderElem = document.getElementById('slider');
 
-            window.showSlide = function(index) {
-                if (presentationSlides.length > 0) {
-                    currentSlide = (index + presentationSlides.length) % presentationSlides.length;
-                    const slide = presentationSlides[currentSlide];
-                    if (slide.type === 'image') {
-                        imageElem.src = slide.data;
+            let currentSlide = 0;
+            let currentMessage = 0;
+
+            function showSlide(index) {
+                if (slides.length > 0) {
+                    currentSlide = (index + slides.length) % slides.length;
+                    const slide = slides[currentSlide];
+
+                    titleElem.textContent = slide.title || "";
+                    descElem.textContent = slide.description || "";
+
+                    const imgSrc = slide.image?.data || (typeof slide.image === 'string' ? slide.image : null);
+
+                    if (imgSrc) {
+                        imageElem.src = imgSrc;
                         mediaElem.hidden = false;
-                        sliderElem.style.backgroundImage = `url("${slide.data}")`;
+                        sliderElem.style.backgroundImage = `url("${imgSrc}")`;
                         sliderElem.classList.add('image-background-slide');
                     } else {
                         imageElem.removeAttribute('src');
@@ -69,28 +79,39 @@
                         sliderElem.style.backgroundImage = '';
                         sliderElem.classList.remove('image-background-slide');
                     }
-                } else {
-                    messageElem.textContent = messages[0] || '';
+                }
+            }
+
+            function updateMessage() {
+                if (messages.length > 0) {
+                    messageElem.style.opacity = '0';
+                    setTimeout(() => {
+                        messageElem.textContent = messages[currentMessage];
+                        messageElem.style.opacity = '1';
+                        currentMessage = (currentMessage + 1) % messages.length;
+                    }, 300);
                 }
             }
 
             showSlide(currentSlide);
+            updateMessage();
 
-            if (presentationSlides.length > 1) {
+            if (slides.length > 1) {
                 setInterval(() => {
-                    currentSlide = (currentSlide + 1) % presentationSlides.length;
+                    currentSlide = (currentSlide + 1) % slides.length;
                     showSlide(currentSlide);
                 }, SLIDE_INTERVAL_MS);
             }
 
-            if (messages.length > 0) {
-                messageElem.textContent = messages[currentMessage];
-                setInterval(() => {
-                    currentMessage = (currentMessage + 1) % messages.length;
-                    messageElem.textContent = messages[currentMessage];
-                }, MESSAGE_INTERVAL_MS);
+            if (messages.length > 1) {
+                setInterval(updateMessage, MESSAGE_INTERVAL_MS);
             }
         }
+
+        window.onload = loadContent;
+    </script>
+</body>
+</html>
 
         window.onload = loadContent;
     </script>
