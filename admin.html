@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Cumpleaños de Mamá</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">⚙️ Panel Admin</div>
+        <nav>
+            <a href="index.html">Ver Sitio Principal 🌸</a>
+        </nav>
+    </header>
+
+    <div class="main-container">
+        <!-- Formulario para agregar Diapositivas -->
+        <form id="slide-form">
+            <h2>Agregar Diapositiva 🖼️</h2>
+            <div class="form-group">
+                <label for="slide-title-input">Título:</label>
+                <input type="text" id="slide-title-input" placeholder="Ej. Te extrañamos mucho" required>
+            </div>
+            <div class="form-group">
+                <label for="slide-desc-input">Descripción:</label>
+                <textarea id="slide-desc-input" rows="3" placeholder="Escribe un mensaje bonito..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="slide-image-input">Imagen para esta diapositiva (opcional):</label>
+                <input type="file" id="slide-image-input" accept="image/*">
+            </div>
+            <p class="form-help">La imagen quedará integrada en esta misma diapositiva y se mostrará como fondo.</p>
+            <button type="submit">Guardar Diapositiva</button>
+        </form>
+
+        <!-- Formulario para agregar Mensajes -->
+        <form id="message-form">
+            <h2>Agregar Mensaje 💌</h2>
+            <div class="form-group">
+                <label for="message-input">Texto del Mensaje:</label>
+                <textarea id="message-input" rows="2" placeholder="Escribe una dedicatoria..." required></textarea>
+            </div>
+            <button type="submit">Guardar Mensaje</button>
+        </form>
+
+        <!-- Listados para eliminar -->
+        <div class="admin-list">
+            <h2>Diapositivas Actuales</h2>
+            <div id="admin-slides-list"></div>
+        </div>
+
+        <div class="admin-list" style="margin-top: 2rem;">
+            <h2>Mensajes Actuales</h2>
+            <div id="admin-messages-list"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function getStorageData() {
+            const defaultSlides = [
+                { title: "¡Feliz Cumpleaños Mamá! 🎉", description: "Hoy celebramos tu vida y todo el amor que nos has dado. ¡Te queremos con todo nuestro corazón!" },
+                { title: "Gracias por tanto amor 🌸", description: "Gracias por ser nuestra guía, por tus consejos y por estar siempre presente. ¡Que disfrutes muchísimo tu día!" },
+                { title: "Eres nuestro ejemplo 💖", description: "Tu cariño, tu fortaleza y tu alegría hacen que cada día sea más especial. ¡Te admiramos muchísimo!" }
+            ];
+            const defaultMessages = [
+                "Mamá, espero que este día esté lleno de alegría y que sientas todo nuestro cariño en cada momento.",
+                "Disfruta muchísimo tu día. Gracias por ser la mejor madre y por todos los momentos que hemos compartido."
+            ];
+
+            const storedSlides = JSON.parse(localStorage.getItem('slides'));
+            const storedMessages = JSON.parse(localStorage.getItem('messages'));
+            const hasLegacyDadContent = storedSlides?.some(slide => slide.title?.includes('Papá'));
+            const hasLegacyDadMessage = storedMessages?.some(message => message.includes('Papá'));
+            const slides = storedSlides && !hasLegacyDadContent ? storedSlides : defaultSlides;
+            const messages = storedMessages && !hasLegacyDadMessage ? storedMessages : defaultMessages;
+            return { slides, messages };
+        }
+
+        function renderAdminLists() {
+            const { slides, messages } = getStorageData();
+
+            // Listar Diapositivas
+            const slidesList = document.getElementById('admin-slides-list');
+            slidesList.innerHTML = '';
+            slides.forEach((slide, index) => {
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                const content = document.createElement('span');
+                content.innerHTML = `<strong>${slide.title}</strong>${slide.image ? ' 📸' : ''}`;
+                const button = document.createElement('button');
+                button.className = 'btn-danger';
+                button.type = 'button';
+                button.textContent = 'Eliminar';
+                button.addEventListener('click', () => deleteSlide(index));
+                item.append(content, button);
+                slidesList.appendChild(item);
+            });
+
+            // Listar Mensajes
+            const messagesList = document.getElementById('admin-messages-list');
+            messagesList.innerHTML = '';
+            messages.forEach((msg, index) => {
+                const item = document.createElement('div');
+                item.className = 'admin-item';
+                item.innerHTML = `
+                    <span style="max-width: 70%;">${msg}</span>
+                    <button class="btn-danger" onclick="deleteMessage(${index})">Eliminar</button>
+                `;
+                messagesList.appendChild(item);
+            });
+
+        }
+
+        // Guardar Diapositiva
+        document.getElementById('slide-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('slide-title-input').value;
+            const description = document.getElementById('slide-desc-input').value;
+            const imageFile = document.getElementById('slide-image-input').files[0];
+            let image;
+
+            if (imageFile) {
+                image = await readImageFile(imageFile);
+            }
+
+            const { slides } = getStorageData();
+            slides.push({ title, description, image });
+            localStorage.setItem('slides', JSON.stringify(slides));
+
+            document.getElementById('slide-form').reset();
+            renderAdminLists();
+        });
+
+        function readImageFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve({
+                    data: reader.result,
+                    name: file.name
+                });
+                reader.onerror = () => reject(new Error(`No se pudo leer ${file.name}`));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Guardar Mensaje
+        document.getElementById('message-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = document.getElementById('message-input').value;
+
+            const { messages } = getStorageData();
+            messages.push(text);
+            localStorage.setItem('messages', JSON.stringify(messages));
+
+            document.getElementById('message-form').reset();
+            renderAdminLists();
+        });
+
+        // Eliminar Diapositiva
+        window.deleteSlide = function(index) {
+            const { slides, messages } = getStorageData();
+            slides.splice(index, 1);
+            localStorage.setItem('slides', JSON.stringify(slides));
+            renderAdminLists();
+        };
+
+        // Eliminar Mensaje
+        window.deleteMessage = function(index) {
+            const { messages } = getStorageData();
+            messages.splice(index, 1);
+            localStorage.setItem('messages', JSON.stringify(messages));
+            renderAdminLists();
+        };
+
+        window.onload = renderAdminLists;
+    </script>
+</body>
+</html>

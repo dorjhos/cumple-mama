@@ -1,0 +1,9 @@
+{
+  "name": "presentacion-cumpleanos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Presentación de cumpleaños con galería de recuerdos",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
