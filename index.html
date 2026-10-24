@@ -11,9 +11,83 @@
         .slide-copy {
             display: none !important;
         }
+
+        /* Pantalla de bienvenida / Cortina inicial */
+        #welcome-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(89, 13, 34, 0.95) 0%, rgba(201, 24, 74, 0.92) 100%);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            color: white;
+            cursor: pointer;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        #welcome-overlay.fade-out {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .welcome-card {
+            max-width: 600px;
+            animation: pulse-welcome 2.5s infinite ease-in-out;
+        }
+
+        .welcome-card h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .welcome-card p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        .welcome-btn {
+            background: #ffffff;
+            color: #c9184a;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .welcome-btn:hover {
+            transform: scale(1.05);
+            background: #fff0f3;
+        }
+
+        @keyframes pulse-welcome {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
     </style>
 </head>
 <body class="presentation-page">
+    
+    <!-- PANTALLA DE BIENVENIDA / CORTINA INICIAL -->
+    <div id="welcome-overlay" onclick="iniciarExperiencia()">
+        <div class="welcome-card">
+            <h1>💐 Para la mejor Mamá 💐</h1>
+            <p>Un pequeño detalle hecho con todo el corazón para celebrar tu día especial.<br>Toca en cualquier lugar para comenzar.</p>
+            <button class="welcome-btn">✨ Toca para continuar ✨</button>
+        </div>
+    </div>
+
     <header>
         <div class="logo">💐 Para la mejor Mamá</div>
         <nav>
@@ -34,14 +108,18 @@
         </section>
     </div>
 
+    <!-- REPRODUCTOR DE MÚSICA OCULTO -->
+    <audio id="bg-music" src="cancion.mp3" loop></audio>
+
     <script>
+        let slides = [];
+        let messages = [];
+        let currentSlide = 0;
+        let currentMessage = 0;
+        let slideshowInterval = null;
+        let messageInterval = null;
+
         async function loadContent() {
-            const SLIDE_INTERVAL_MS = 8000;
-            const MESSAGE_INTERVAL_MS = 4000;
-
-            let slides = [];
-            let messages = [];
-
             try {
                 const response = await fetch('/api/data');
                 const data = await response.json();
@@ -50,20 +128,31 @@
             } catch (error) {
                 console.error("Error al conectar con el servidor:", error);
             }
+        }
 
+        // Función que se ejecuta al hacer clic en la portada de bienvenida
+        function iniciarExperiencia() {
+            const overlay = document.getElementById('welcome-overlay');
+            overlay.classList.add('fade-out');
+
+            // Reproducir música de fondo
+            const music = document.getElementById('bg-music');
+            music.play().catch(e => console.log("Audio pausado por el navegador:", e));
+
+            // Iniciar la presentación de fotos y mensajes
+            iniciarPresentacion();
+        }
+
+        function iniciarPresentacion() {
             const mediaElem = document.getElementById('slide-media');
             const imageElem = document.getElementById('slide-image');
             const messageElem = document.getElementById('presentation-message');
             const sliderElem = document.getElementById('slider');
 
-            let currentSlide = 0;
-            let currentMessage = 0;
-
             function showSlide(index) {
                 if (slides.length > 0) {
                     currentSlide = (index + slides.length) % slides.length;
                     const slide = slides[currentSlide];
-
                     const imgSrc = slide.image?.data || (typeof slide.image === 'string' ? slide.image : null);
 
                     if (imgSrc) {
@@ -94,45 +183,20 @@
             showSlide(currentSlide);
             updateMessage();
 
-            if (slides.length > 1) {
-                setInterval(() => {
+            if (slides.length > 1 && !slideshowInterval) {
+                slideshowInterval = setInterval(() => {
                     currentSlide = (currentSlide + 1) % slides.length;
                     showSlide(currentSlide);
-                }, SLIDE_INTERVAL_MS);
+                }, 8000);
             }
 
-            if (messages.length > 1) {
-                setInterval(updateMessage, MESSAGE_INTERVAL_MS);
+            if (messages.length > 1 && !messageInterval) {
+                messageInterval = setInterval(updateMessage, 4000);
             }
         }
 
+        // Precargar los datos del servidor al cargar la página en segundo plano
         window.onload = loadContent;
-    </script>
-
-    <!-- 🎵 REPRODUCTOR DE MÚSICA OCULTO (Se activa con el primer toque en pantalla) -->
-    <audio id="bg-music" src="cancion.mp3" loop></audio>
-
-    <script>
-        let musicaIniciada = false;
-
-        function activarMusicaAlInteractuar() {
-            if (!musicaIniciada) {
-                const music = document.getElementById('bg-music');
-                
-                music.play().then(() => {
-                    musicaIniciada = true;
-                    window.removeEventListener('click', activarMusicaAlInteractuar);
-                    window.removeEventListener('touchstart', activarMusicaAlInteractuar);
-                    window.removeEventListener('keydown', activarMusicaAlInteractuar);
-                }).catch(error => {
-                    console.log("Esperando la primera interacción del usuario para iniciar audio...");
-                });
-            }
-        }
-
-        window.addEventListener('click', activarMusicaAlInteractuar);
-        window.addEventListener('touchstart', activarMusicaAlInteractuar);
-        window.addEventListener('keydown', activarMusicaAlInteractuar);
     </script>
 </body>
 </html>
