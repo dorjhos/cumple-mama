@@ -6,6 +6,12 @@
     <title>¡Feliz Cumpleaños Mamá! 💖</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Oculta los textos de título y descripción en la presentación principal */
+        .slide-copy {
+            display: none !important;
+        }
+    </style>
 </head>
 <body class="presentation-page">
     <header>
@@ -21,10 +27,7 @@
             <div class="slide-media" id="slide-media" hidden>
                 <img id="slide-image" alt="Recuerdo especial de mamá">
             </div>
-            <div class="slide-copy" id="slide-copy">
-                <h2 class="slide-title" id="slide-title">Cargando del servidor...</h2>
-                <p class="slide-desc" id="slide-desc"></p>
-            </div>
+            <!-- Mensaje flotante animado -->
             <div class="message-banner">
                 <p class="presentation-message" id="presentation-message"></p>
             </div>
@@ -50,8 +53,6 @@
 
             const mediaElem = document.getElementById('slide-media');
             const imageElem = document.getElementById('slide-image');
-            const titleElem = document.getElementById('slide-title');
-            const descElem = document.getElementById('slide-desc');
             const messageElem = document.getElementById('presentation-message');
             const sliderElem = document.getElementById('slider');
 
@@ -62,9 +63,6 @@
                 if (slides.length > 0) {
                     currentSlide = (index + slides.length) % slides.length;
                     const slide = slides[currentSlide];
-
-                    titleElem.textContent = slide.title || "";
-                    descElem.textContent = slide.description || "";
 
                     const imgSrc = slide.image?.data || (typeof slide.image === 'string' ? slide.image : null);
 
