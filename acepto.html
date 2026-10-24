@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Juego de Interruptores - Evento cada 4 Niveles</title>
+  <title>Juego de Interruptores - Especial Mamá</title>
   <style>
     * {
       box-sizing: border-box;
@@ -12,15 +12,71 @@
     }
 
     body {
-      background-color: #f8fafc;
+      background-color: #fdf2f4;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      gap: 20px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      padding: 20px;
+      gap: 15px;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      padding-bottom: 30px;
+    }
+
+    /* Panel superior de navegación */
+    .top-panel {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 0.9rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(201, 24, 74, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      margin-bottom: 10px;
+    }
+
+    .top-panel .game-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #590d22;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .top-panel .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      background: #ff4d6d;
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .btn-nav:hover {
+      background: #c9184a;
+    }
+
+    .btn-nav-admin {
+      background: #590d22;
+    }
+
+    .btn-nav-admin:hover {
+      background: #38040e;
     }
 
     .header-info {
@@ -31,7 +87,7 @@
     }
 
     .nivel-tag {
-      background-color: #ef4444;
+      background-color: #ff4d6d;
       color: #ffffff;
       padding: 4px 14px;
       border-radius: 20px;
@@ -39,13 +95,13 @@
       font-weight: 800;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 4px 10px rgba(255, 77, 109, 0.3);
     }
 
     .objetivo {
       font-size: 1.15rem;
       font-weight: 600;
-      color: #1e293b;
+      color: #590d22;
       text-align: center;
     }
 
@@ -54,11 +110,12 @@
       gap: 24px;
       font-size: 1.05rem;
       font-weight: bold;
-      color: #475569;
+      color: #590d22;
       background: #ffffff;
       padding: 10px 20px;
       border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: 1px solid rgba(255, 182, 193, 0.4);
     }
 
     .board-container {
@@ -73,7 +130,7 @@
       width: 70px;
       height: 70px;
       border-radius: 14px;
-      border: 3px solid #cbd5e1;
+      border: 3px solid #ffccd5;
       cursor: pointer;
       transition: background-color 0.25s ease, transform 0.1s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     }
@@ -83,30 +140,30 @@
     }
 
     .btn.apagado {
-      background-color: #334155;
-      border-color: #1e293b;
+      background-color: #590d22;
+      border-color: #38040e;
     }
 
     .btn.encendido {
-      background-color: #ef4444;
-      border-color: #b91c1c;
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+      background-color: #ff4d6d;
+      border-color: #c9184a;
+      box-shadow: 0 0 20px rgba(255, 77, 109, 0.7);
     }
 
     .btn-reiniciar {
       padding: 12px 26px;
-      background-color: #0f172a;
+      background-color: #c9184a;
       color: #ffffff;
       border: none;
       border-radius: 10px;
       cursor: pointer;
       font-weight: bold;
       font-size: 0.95rem;
-      transition: background-color 0.2s ease, transform 0.1s ease;
+      transition: background-color 0.2s ease;
     }
 
     .btn-reiniciar:hover {
-      background-color: #334155;
+      background-color: #a0123a;
     }
 
     /* Modal de Victoria */
@@ -116,7 +173,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(15, 23, 42, 0.65);
+      background: rgba(34, 9, 20, 0.65);
       backdrop-filter: blur(6px);
       display: flex;
       justify-content: center;
@@ -156,7 +213,7 @@
     .win-title {
       font-size: 1.6rem;
       font-weight: 800;
-      color: #0f172a;
+      color: #590d22;
       margin-bottom: 8px;
     }
 
@@ -174,7 +231,7 @@
     }
 
     .win-stat-box {
-      background: #f1f5f9;
+      background: #fff0f3;
       padding: 14px 10px;
       border-radius: 12px;
     }
@@ -182,7 +239,7 @@
     .win-stat-val {
       font-size: 1.4rem;
       font-weight: 800;
-      color: #ef4444;
+      color: #ff4d6d;
     }
 
     .win-stat-lbl {
@@ -207,25 +264,23 @@
       font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.1s ease;
+      transition: background-color 0.2s ease;
     }
 
     .btn-eje-y {
-      background: #2563eb;
-      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+      background: #ff4d6d;
     }
 
     .btn-eje-y:hover {
-      background: #1d4ed8;
+      background: #c9184a;
     }
 
     .btn-eje-x {
-      background: #ef4444;
-      box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+      background: #ff758f;
     }
 
     .btn-eje-x:hover {
-      background: #dc2626;
+      background: #ff4d6d;
     }
 
     .btn-reintentar-nivel {
@@ -237,15 +292,19 @@
       font-size: 0.85rem;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
-
-    .btn-reintentar-nivel:hover {
-      background: #f1f5f9;
     }
   </style>
 </head>
 <body>
+
+  <!-- BARRA SUPERIOR PARA REGRESAR AL ADMIN Y AL INICIO -->
+  <header class="top-panel">
+    <div class="game-title">🎮 Juego de Interruptores</div>
+    <div class="nav-buttons">
+      <a href="admin.html" class="btn-nav btn-nav-admin">⚙️ Volver al Admin</a>
+      <a href="index.html" class="btn-nav">🌸 Inicio</a>
+    </div>
+  </header>
 
   <div class="header-info">
     <div class="nivel-tag" id="nivelTag">Matriz: 1 (Eje Y) × 4 (Eje X)</div>
@@ -312,8 +371,7 @@
       let segundos = 0;
       let temporizador = null;
       let juegoActivo = false;
-      
-      let nivelesCompletados = 0; // ◄ CONTADOR DE NIVELES COMPLETADOS
+      let nivelesCompletados = 0;
 
       function aplicarToque(r, c) {
         const toggleCell = (row, col) => {
@@ -409,12 +467,11 @@
           juegoActivo = false;
           detenerCronometro();
 
-          nivelesCompletados++; // ◄ SE INCREMENTA CADA VEZ QUE GANAS
+          nivelesCompletados++;
 
           winMovimientos.textContent = movimientos;
           winTiempo.textContent = tiempoEl.textContent;
 
-          // ◄ EVENTO ESPECIAL CADA 4 NIVELES (4, 8, 12, etc.)
           if (nivelesCompletados % 4 === 0) {
             winIcon.textContent = "🏆";
             winTitle.textContent = `🌟 ¡HITO DE ${nivelesCompletados} NIVELES! 🌟`;
