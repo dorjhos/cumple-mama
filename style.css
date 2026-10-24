@@ -65,7 +65,7 @@ nav a:hover {
     display: flex;
 }
 
-/* Diapositivas / Slideshow */
+/* Contenedor principal de la presentación */
 .slider-container {
     background: white;
     border-radius: 20px;
@@ -96,9 +96,9 @@ nav a:hover {
     inset: 0;
     background: linear-gradient(
         180deg,
-        rgba(34, 9, 20, 0.45) 0%,
-        rgba(34, 9, 20, 0.12) 42%,
-        rgba(34, 9, 20, 0.65) 100%
+        rgba(34, 9, 20, 0.25) 0%,
+        rgba(34, 9, 20, 0.05) 50%,
+        rgba(34, 9, 20, 0.75) 100%
     );
     z-index: 0;
 }
@@ -108,22 +108,9 @@ nav a:hover {
     z-index: 1;
 }
 
-.slider-container.image-background-slide .slide-badge {
-    background: rgba(255, 117, 143, 0.92);
-}
-
-.slider-container.image-background-slide .slide-title,
-.slider-container.image-background-slide .slide-desc {
-    color: white;
-    text-shadow: 0 2px 8px rgba(34, 9, 20, 0.75);
-}
-
+/* ELIMINAMOS COMPLETAMENTE LA CAJA OSCURA DE TEXTO QUE MOLESTABA */
 .slider-container.image-background-slide .slide-copy {
-    background: rgba(34, 9, 20, 0.3);
-    border-radius: 14px;
-    padding: clamp(0.75rem, 2vw, 1.25rem);
-    max-width: 850px;
-    margin: 0 auto;
+    display: none !important;
 }
 
 .presentation-message {
@@ -148,7 +135,7 @@ nav a:hover {
     margin: 0;
     transform: translateX(-50%);
     color: white;
-    text-shadow: 0 2px 8px rgba(34, 9, 20, 0.8);
+    text-shadow: 0 2px 8px rgba(34, 9, 20, 0.85);
 }
 
 .slide-media {
@@ -167,7 +154,7 @@ nav a:hover {
 .slide-media img {
     display: block;
     max-width: 100%;
-    max-height: min(58vh, 620px);
+    max-height: min(65vh, 680px);
     width: auto;
     height: auto;
     object-fit: contain;
@@ -176,108 +163,7 @@ nav a:hover {
 }
 
 .slide-copy {
-    flex-shrink: 0;
-}
-
-.slide-copy.image-slide-copy .slide-title {
-    font-size: clamp(1.25rem, 2.8vw, 2rem);
-    margin-bottom: 0.35rem;
-}
-
-.slide-copy.image-slide-copy .slide-desc {
-    font-size: clamp(0.85rem, 1.4vw, 1rem);
-}
-
-.slide-badge {
-    display: inline-block;
-    background: #ff758f;
-    color: white;
-    padding: 0.3rem 1rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.slide-title {
-    font-size: 2.2rem;
-    color: #590d22;
-    margin-bottom: 1rem;
-    font-weight: 700;
-}
-
-.slide-desc {
-    font-size: 1.15rem;
-    color: #6c757d;
-    line-height: 1.6;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.slider-controls {
-    margin-top: clamp(0.75rem, 2vh, 2rem);
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-@media (max-width: 600px) {
-    body.presentation-page header {
-        padding: 0.65rem 0.9rem;
-    }
-
-    .presentation-page .logo {
-        font-size: 0.95rem;
-    }
-
-    .presentation-page nav a {
-        margin-left: 0.5rem;
-        font-size: 0.78rem;
-    }
-
-    .presentation-page .main-container {
-        padding: 0.55rem;
-    }
-
-    .presentation-page .slider-container {
-        border-radius: 14px;
-        padding: 0.8rem;
-    }
-
-    .slide-title {
-        font-size: clamp(1.35rem, 7vw, 2rem);
-        margin-bottom: 0.5rem;
-    }
-
-    .slide-desc {
-        font-size: 0.95rem;
-        line-height: 1.4;
-    }
-
-    .slide-media img {
-        max-height: 52vh;
-        border-radius: 10px;
-    }
-
-    .slider-btn {
-        padding: 0.45rem 0.75rem;
-        font-size: 0.8rem;
-    }
-}
-
-.slider-btn {
-    background: #ff4d6d;
-    color: white;
-    border: none;
-    padding: 0.5rem 1.2rem;
-    border-radius: 25px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-}
-
-.slider-btn:hover {
-    background: #c9184a;
+    display: none !important;
 }
 
 /* Estilos para el Panel Admin */
@@ -315,28 +201,6 @@ form h2 {
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s;
-}
-
-.form-help {
-    color: #6c757d;
-    font-size: 0.9rem;
-    margin: -0.5rem 0 1.25rem;
-}
-
-.admin-images-list {
-    display: grid;
-    gap: 0.5rem;
-}
-
-.image-admin-item {
-    gap: 1rem;
-}
-
-.admin-image-preview {
-    width: 64px;
-    height: 64px;
-    border-radius: 8px;
-    object-fit: cover;
 }
 
 .form-group input:focus, .form-group textarea:focus {
