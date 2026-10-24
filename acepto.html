@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Juego de Interruptores - Evento cada 4 Niveles</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding: 20px;
+    }
+
+    .header-info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nivel-tag {
+      background-color: #ef4444;
+      color: #ffffff;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+    }
+
+    .objetivo {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #1e293b;
+      text-align: center;
+    }
+
+    .stats {
+      display: flex;
+      gap: 24px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #475569;
+      background: #ffffff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .board-container {
+      display: grid;
+      gap: 12px;
+      justify-content: center;
+      max-width: 95vw;
+      margin: 10px 0;
+    }
+
+    .btn {
+      width: 70px;
+      height: 70px;
+      border-radius: 14px;
+      border: 3px solid #cbd5e1;
+      cursor: pointer;
+      transition: background-color 0.25s ease, transform 0.1s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.92);
+    }
+
+    .btn.apagado {
+      background-color: #334155;
+      border-color: #1e293b;
+    }
+
+    .btn.encendido {
+      background-color: #ef4444;
+      border-color: #b91c1c;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+    }
+
+    .btn-reiniciar {
+      padding: 12px 26px;
+      background-color: #0f172a;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-reiniciar:hover {
+      background-color: #334155;
+    }
+
+    /* Modal de Victoria */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 100;
+    }
+
+    .modal-overlay.activo {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .win-card {
+      background: #ffffff;
+      padding: 36px 32px;
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      transform: scale(0.85);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.activo .win-card {
+      transform: scale(1);
+    }
+
+    .win-icon {
+      font-size: 3.5rem;
+      margin-bottom: 12px;
+    }
+
+    .win-title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+
+    .win-subtitle {
+      font-size: 0.95rem;
+      color: #64748b;
+      margin-bottom: 24px;
+    }
+
+    .win-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .win-stat-box {
+      background: #f1f5f9;
+      padding: 14px 10px;
+      border-radius: 12px;
+    }
+
+    .win-stat-val {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #ef4444;
+    }
+
+    .win-stat-lbl {
+      font-size: 0.8rem;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-action {
+      width: 100%;
+      padding: 13px;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-eje-y {
+      background: #2563eb;
+      box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-eje-y:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-eje-x {
+      background: #ef4444;
+      box-shadow: 0 8px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-eje-x:hover {
+      background: #dc2626;
+    }
+
+    .btn-reintentar-nivel {
+      padding: 10px;
+      background: transparent;
+      color: #64748b;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .btn-reintentar-nivel:hover {
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-info">
+    <div class="nivel-tag" id="nivelTag">Matriz: 1 (Eje Y) × 4 (Eje X)</div>
+    <div class="objetivo">Objetivo: ¡Enciende todas las luces para ganar!</div>
+  </div>
+
+  <div class="stats">
+    <div>Movimientos: <span id="movimientos">0</span></div>
+    <div>Tiempo: <span id="tiempo">00:00</span></div>
+  </div>
+
+  <div class="board-container" id="board"></div>
+
+  <button class="btn-reiniciar" id="btnReiniciar">Reiniciar Nivel</button>
+
+  <div class="modal-overlay" id="winModal">
+    <div class="win-card">
+      <div class="win-icon" id="winIcon">🎉</div>
+      <h2 class="win-title" id="winTitle">¡Nivel Superado!</h2>
+      <p class="win-subtitle" id="winSubtitle">Elige cómo deseas expandir tu matriz:</p>
+
+      <div class="win-stats-grid">
+        <div class="win-stat-box">
+          <div class="win-stat-val" id="winMovimientos">0</div>
+          <div class="win-stat-lbl">Movimientos</div>
+        </div>
+        <div class="win-stat-box">
+          <div class="win-stat-val" id="winTiempo">00:00</div>
+          <div class="win-stat-lbl">Tiempo Total</div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-action btn-eje-y" id="btnEjeY">Aumentar Eje Y</button>
+        <button class="btn-action btn-eje-x" id="btnEjeX">Aumentar Eje X</button>
+        <button class="btn-reintentar-nivel" id="btnReintentarNivel">Repetir este nivel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const board = document.getElementById('board');
+      const movimientosEl = document.getElementById('movimientos');
+      const tiempoEl = document.getElementById('tiempo');
+      const nivelTag = document.getElementById('nivelTag');
+      const btnReiniciar = document.getElementById('btnReiniciar');
+
+      const winModal = document.getElementById('winModal');
+      const winIcon = document.getElementById('winIcon');
+      const winTitle = document.getElementById('winTitle');
+      const winMovimientos = document.getElementById('winMovimientos');
+      const winTiempo = document.getElementById('winTiempo');
+      const winSubtitle = document.getElementById('winSubtitle');
+      const btnEjeY = document.getElementById('btnEjeY');
+      const btnEjeX = document.getElementById('btnEjeX');
+      const btnReintentarNivel = document.getElementById('btnReintentarNivel');
+
+      const BASE_COLS = 4;
+      let filasY = 1;
+      let columnasX = BASE_COLS;
+      let states = [];
+      let movimientos = 0;
+      let segundos = 0;
+      let temporizador = null;
+      let juegoActivo = false;
+      
+      let nivelesCompletados = 0; // ◄ CONTADOR DE NIVELES COMPLETADOS
+
+      function aplicarToque(r, c) {
+        const toggleCell = (row, col) => {
+          if (row >= 0 && row < filasY && col >= 0 && col < columnasX) {
+            const index = row * columnasX + col;
+            states[index] = !states[index];
+          }
+        };
+
+        toggleCell(r, c);
+        toggleCell(r - 1, c);
+        toggleCell(r + 1, c);
+        toggleCell(r, c - 1);
+        toggleCell(r, c + 1);
+      }
+
+      function randomizarEstados() {
+        const total = filasY * columnasX;
+        states = new Array(total).fill(false);
+        const pasosAleatorios = Math.min(8, Math.floor(total * 0.65) + 2);
+
+        for (let i = 0; i < pasosAleatorios; i++) {
+          const r = Math.floor(Math.random() * filasY);
+          const c = Math.floor(Math.random() * columnasX);
+          aplicarToque(r, c);
+        }
+
+        if (states.every(s => s === true)) {
+          aplicarToque(0, 0);
+        }
+      }
+
+      function iniciarCronometro() {
+        detenerCronometro();
+        segundos = 0;
+        actualizarTextoTiempo();
+        temporizador = setInterval(() => {
+          segundos++;
+          actualizarTextoTiempo();
+        }, 1000);
+      }
+
+      function detenerCronometro() {
+        if (temporizador) {
+          clearInterval(temporizador);
+          temporizador = null;
+        }
+      }
+
+      function actualizarTextoTiempo() {
+        const min = String(Math.floor(segundos / 60)).padStart(2, '0');
+        const seg = String(segundos % 60).padStart(2, '0');
+        tiempoEl.textContent = `${min}:${seg}`;
+      }
+
+      function renderBoard() {
+        board.innerHTML = '';
+        board.style.gridTemplateColumns = `repeat(${columnasX}, 1fr)`;
+        nivelTag.textContent = `Eje Y (Filas): ${filasY} × Eje X (Cols): ${columnasX} | Completados: ${nivelesCompletados}`;
+
+        for (let r = 0; r < filasY; r++) {
+          for (let c = 0; c < columnasX; c++) {
+            const index = r * columnasX + c;
+            const isOn = states[index];
+
+            const btn = document.createElement('div');
+            btn.classList.add('btn');
+            btn.classList.add(isOn ? 'encendido' : 'apagado');
+
+            btn.addEventListener('click', () => {
+              if (!juegoActivo) return;
+              toggleLight(r, c);
+            });
+
+            board.appendChild(btn);
+          }
+        }
+      }
+
+      function toggleLight(r, c) {
+        movimientos++;
+        movimientosEl.textContent = movimientos;
+
+        aplicarToque(r, c);
+        renderBoard();
+        checkWinCondition();
+      }
+
+      function checkWinCondition() {
+        const victoria = states.every(state => state === true);
+
+        if (victoria) {
+          juegoActivo = false;
+          detenerCronometro();
+
+          nivelesCompletados++; // ◄ SE INCREMENTA CADA VEZ QUE GANAS
+
+          winMovimientos.textContent = movimientos;
+          winTiempo.textContent = tiempoEl.textContent;
+
+          // ◄ EVENTO ESPECIAL CADA 4 NIVELES (4, 8, 12, etc.)
+          if (nivelesCompletados % 4 === 0) {
+            winIcon.textContent = "🏆";
+            winTitle.textContent = `🌟 ¡HITO DE ${nivelesCompletados} NIVELES! 🌟`;
+            winSubtitle.textContent = `¡Increíble logro! Has completado un ciclo de 4 niveles.`;
+          } else {
+            winIcon.textContent = "🎉";
+            winTitle.textContent = "¡Nivel Superado!";
+            winSubtitle.textContent = `Matriz superada (${filasY} filas × ${columnasX} cols). Total ganados: ${nivelesCompletados}`;
+          }
+
+          const sigFilasY = filasY + 1;
+          const sigColsY = BASE_COLS;
+
+          const sigFilasX = filasY;
+          const sigColsX = columnasX + 1;
+
+          btnEjeY.textContent = `Aumentar Eje Y ➔ (${sigFilasY} filas × ${sigColsY} cols)`;
+          btnEjeX.textContent = `Aumentar Eje X ➔ (${sigFilasX} filas × ${sigColsX} cols)`;
+
+          btnEjeY.dataset.nextRows = sigFilasY;
+          btnEjeY.dataset.nextCols = sigColsY;
+
+          btnEjeX.dataset.nextRows = sigFilasX;
+          btnEjeX.dataset.nextCols = sigColsX;
+
+          setTimeout(() => {
+            winModal.classList.add('activo');
+          }, 150);
+        }
+      }
+
+      function iniciarNivel(nuevasFilas, nuevasColumnas) {
+        winModal.classList.remove('activo');
+        filasY = nuevasFilas;
+        columnasX = nuevasColumnas;
+        movimientos = 0;
+        movimientosEl.textContent = movimientos;
+
+        randomizarEstados();
+        renderBoard();
+        iniciarCronometro();
+        juegoActivo = true;
+      }
+
+      btnReiniciar.addEventListener('click', () => iniciarNivel(filasY, columnasX));
+      btnReintentarNivel.addEventListener('click', () => iniciarNivel(filasY, columnasX));
+
+      btnEjeY.addEventListener('click', () => {
+        const nextRows = parseInt(btnEjeY.dataset.nextRows);
+        const nextCols = parseInt(btnEjeY.dataset.nextCols);
+        iniciarNivel(nextRows, nextCols);
+      });
+
+      btnEjeX.addEventListener('click', () => {
+        const nextRows = parseInt(btnEjeX.dataset.nextRows);
+        const nextCols = parseInt(btnEjeX.dataset.nextCols);
+        iniciarNivel(nextRows, nextCols);
+      });
+
+      iniciarNivel(1, BASE_COLS);
+    })();
+  </script>
+
+</body>
+</html>
