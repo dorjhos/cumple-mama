@@ -48,6 +48,7 @@
             <a href="acepto.html" class="btn-game">Iniciar Juego ➔</a>
         </div>
 
+        <!-- FORMULARIO DE FOTOS (FALTABA EN TU VISTA) -->
         <form id="slide-form">
             <h2>Agregar Foto a la Presentación 🖼️</h2>
             <div class="form-group">
@@ -57,6 +58,7 @@
             <button type="submit">Guardar Foto en el Servidor</button>
         </form>
 
+        <!-- FORMULARIO DE MENSAJES -->
         <form id="message-form">
             <h2>Agregar Mensaje Flotante 💌</h2>
             <div class="form-group">
@@ -169,7 +171,6 @@
             }
         }
 
-        // Función para comprimir imágenes del lado del cliente antes de subirlas
         function compressAndReadImage(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -201,7 +202,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // Comprimir a JPEG con calidad 0.8
                         const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
                         resolve({ data: compressedBase64, name: file.name });
                     };
